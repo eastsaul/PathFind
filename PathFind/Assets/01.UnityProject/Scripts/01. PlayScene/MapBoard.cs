@@ -5,25 +5,35 @@ using UnityEngine;
 public class MapBoard : MonoBehaviour
 {
     private const string TERRAIN_MAP_OBJ_NAME = "Map";
+    private const string OBSTACLE_MAP_OBJ_NAME = "ObstacleMap";
 
     public Vector2Int MapCellSize { get; private set; } = default;
 
     public Vector2 MapCellGap { get; private set; } = default;
 
     private TerrainMap terrainMap = default;
+    private ObstacleMap obstacleMap = default;
 
 
     private void Awake()
     {
         // 각종 매니저를 모두 초기화한다.
         ResManager.Instance.Create();
+        PathFinder.Instance.Create();
         // 각종 매니저를 모두 초기화한다.
+
+        // PathFinder 에 맵 보드 컨트롤러를 캐싱한다.
+        PathFinder.Instance.mapBoard = this;
 
         //맵에 지형을 초기화하여 배치한다.
         terrainMap = gameObject.FindChildComponent<TerrainMap>(TERRAIN_MAP_OBJ_NAME);
         terrainMap.InitAwake(this);
         MapCellSize = terrainMap.GetCellSize();
         MapCellGap= terrainMap.GetCellGap();
+
+        // 맵에 지물을 초기화하여 배치한다.
+        obstacleMap = gameObject.FindChildComponent<ObstacleMap>(OBSTACLE_MAP_OBJ_NAME);
+        obstacleMap.InitAwake(this);
     }
 
     //! 타일 인덱스를 받아서 해당 타일을 리턴하는 함수
@@ -47,6 +57,8 @@ public class MapBoard : MonoBehaviour
         for (int y = 0; y < MapCellSize.y; y++) 
         {
             tileIdx1D = y * MapCellSize.x + xIdx2D;
+
+            tempTile = terrainMap.GetTile(tileIdx1D);
             terrains.Add(tempTile);
         }   // loop: y 열의 크기만큼 수노히하는 루프
 
@@ -87,7 +99,7 @@ public class MapBoard : MonoBehaviour
 
         Vector2Int distance2D = Vector2Int.zero;
         distance2D.x = Mathf.RoundToInt(localDistance.x / MapCellGap.x);
-        distance2D.y = Mathf.RoundToInt(localDistance.y/ MapCellGap.y);
+        distance2D.y = Mathf.RoundToInt(localDistance.y / MapCellGap.y);
 
         distance2D = GFunc.Abs(distance2D);
 

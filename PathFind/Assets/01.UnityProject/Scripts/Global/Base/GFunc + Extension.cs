@@ -55,4 +55,29 @@ public static partial class GFunc
         bool isEquals = Mathf.Approximately(targetValue, compareValue);
         return isEquals;
     }
+
+    #region A star function
+    //! 두 노드가 중복인지 검사하는 함수
+    public static AStarNode FindNode(
+        this List<AStarNode> nodelist, AStarNode compareNode)
+    {
+        if (nodelist.IsValid() == false) { return default; }
+
+        AStarNode resultNode = default;
+        foreach (var node_ in nodelist)
+        {
+            if (node_.Terrain == default || node_.Terrain == null) { continue; }
+            else if (compareNode.Terrain == default ||
+                compareNode.Terrain == null) { continue; }
+            if (node_.Terrain.TileIdx1D.Equals(
+                compareNode.Terrain.TileIdx1D))
+            {
+                resultNode = node_;
+            }
+            else { continue; }
+        }   // loop: 노드 리스트를 순회하는 루프
+
+        return resultNode;
+    }
+    #endregion
 }
